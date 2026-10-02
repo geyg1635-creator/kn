@@ -4,8 +4,8 @@ import re
 from datetime import datetime
 
 SOURCES = [
-    {"name": "财联社", "url": "https://api.vvhan.com/api/hotlist/caijing"},
-    {"name": "36氪", "url": "https://api.vvhan.com/api/hotlist/36kr"},
+    {"name": "澎湃财经", "url": "https://api.vvhan.com/api/hotlist/thepaper"},
+    {"name": "百度财经", "url": "https://api.vvhan.com/api/hotlist/baidu"},
 ]
 
 def fetch(url):
