@@ -3,14 +3,18 @@ import urllib.request
 import re
 from datetime import datetime
 
+# 财经新闻源
 SOURCES = [
-    {"name": "澎湃财经", "url": "https://api.vvhan.com/api/hotlist/thepaper"},
-    {"name": "百度财经", "url": "https://api.vvhan.com/api/hotlist/baidu"},
+    {"name": "东方财富", "url": "https://api.vvhan.com/api/hotlist/eastmoney"},
+    {"name": "同花顺", "url": "https://api.vvhan.com/api/hotlist/10jqka"},
+    {"name": "华尔街见闻", "url": "https://api.vvhan.com/api/hotlist/wallstreetcn"},
 ]
 
 def fetch(url):
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        req = urllib.request.Request(url, headers={
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        })
         with urllib.request.urlopen(req, timeout=15) as resp:
             return json.loads(resp.read().decode("utf-8"))
     except Exception as e:
@@ -26,9 +30,15 @@ def main():
         items = data.get("data", [])
         if isinstance(items, dict):
             items = items.get("list", [])
+        if not isinstance(items, list):
+            continue
         for item in items[:8]:
-            title = item.get("title") or item.get("name") or ""
-            url = item.get("url") or item.get("link") or ""
+            if isinstance(item, str):
+                title = item
+                url = ""
+            else:
+                title = item.get("title") or item.get("name") or ""
+                url = item.get("url") or item.get("link") or ""
             if title:
                 news_list.append({
                     "title": re.sub(r"<[^>]+>", "", title).strip(),
@@ -45,6 +55,9 @@ def main():
 
     news = unique[:12]
     updated = datetime.now().strftime("%Y-%m-%d %H:%M")
+
+    if not news:
+        news = [{"title": "今日暂无新闻，请稍后刷新", "url": "", "source": "系统"}]
 
     items_html = ""
     for item in news:
